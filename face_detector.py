@@ -30,7 +30,7 @@ video = args.video
 video_capture = cv2.VideoCapture(video)
 
 video_capture_frame_count = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT));
-print('Total Frames: {}'.format(video_capture_frame_count))
+print(f'Total Frames: {video_capture_frame_count}')
 
 # sort inital folders
 base_folder = 'faces/{}'.format(re.sub('[^0-9a-zA-Z]+', '_', video))
@@ -98,14 +98,14 @@ while video_capture.isOpened():
             
             if not matched:
                 tmp = {
-                    'name': 'E{}'.format(len(persons)+1),
+                    'name': f'E{len(persons)+1}',
                     'faces': [face]
                 }
                 name = tmp['name']
                 matchAccuracy = 1
                 persons.append(tmp)
 
-            print(' - Found {} ({})'.format(name, matchAccuracy))
+            print(f' - Found {name} ({matchAccuracy})')
             names.append(name)
             matchPs.append(matchAccuracy)
 
@@ -132,13 +132,14 @@ while video_capture.isOpened():
 
 averageFaces = statistics.mean(map(lambda p: len(p['faces']), persons))
 
-print('Checking for potential false positive Threshold ({})'.format(averageFaces))
+print(f'Checking for potential false positive Threshold ({averageFaces})')
 for person in persons:
     faceThreshold = averageFaces * .25
     faceCount = len(person['faces'])
 
     if len(person['faces']) < faceThreshold:
-        print(' - Potential false: {} faces ({}/{})'.format(person['name'], faceCount, faceThreshold))
+        person_name = person['name']
+        print(f' - Potential false: {person_name} faces ({faceCount}/{faceThreshold})')
 
         for face in person['faces']:
             matchData = []
@@ -164,7 +165,8 @@ for person in persons:
                 matchAccuracy = data['matchAccuracy']
 
                 if matchAccuracy > args.matchaccuracy:
-                    print('Face better matches {}'.format(data['person']['name']))
+                    persons_name = data['person']['name']
+                    print(f'Face better matches {persons_name}')
 
 
 video_capture.release()
