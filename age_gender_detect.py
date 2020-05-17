@@ -19,7 +19,7 @@ outputData = {
 	"files": []
 }
 
-# Setuo Neural Networks
+# Setup Convoluted Neural Networks
 ageNet = cv2.dnn.readNet("networks/age/age_net.caffemodel", "networks/age/age_deploy.prototxt")
 genderNet = cv2.dnn.readNet("networks/gender/gender_net.caffemodel", "networks/gender/gender_deploy.prototxt")
 
