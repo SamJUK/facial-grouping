@@ -14,8 +14,8 @@ $ python face_detector.py --video="input/vide-file.mp4" --tolerance=.7 --blur=10
 	- `-1` = Every frame
 	- `High Number` = Fast, Less Accurate
 	- `Low number` = Slower, more accurate
-- **matchaccuracy: ** What percentage of faces to match in a person group to be classified the same
+- **matchaccuracy:** What percentage of faces to match in a person group to be classified the same
 	- `0.15` = Default
-- **blur: ** Integer of blur intensity (only affects preview)
-- **framesize: ** float from `0 - 1` that scales the image size (smaller is faster but less accurate)
-- **tolerance: ** Face detection match tolerance
+- **blur:** Integer of blur intensity (only affects preview)
+- **framesize:** float from `0 - 1` that scales the image size (smaller is faster but less accurate)
+- **tolerance:** Face detection match tolerance
