@@ -90,10 +90,7 @@ base_folder = f'faces/{alphanumeric_video_name}'
 makeFolder(base_folder)
 
 # Base definition for variables
-face_encs = []
-face_names = []
 persons = []
-saved_frames = []
 frame_count = 0
 
 # Process Video
