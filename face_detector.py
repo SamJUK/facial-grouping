@@ -142,6 +142,32 @@ for person in persons:
     if len(person['faces']) < faceThreshold:
         print(' - Potential false: {} faces ({}/{})'.format(person['name'], faceCount, faceThreshold))
 
+        for face in person['faces']:
+            matchData = []
+            for possiblePerson in persons:
+                if possiblePerson == person:
+                    continue
+
+                matches = face_recognition.compare_faces(possiblePerson['faces'], face, args.tolerance)
+                matchAccuracy = (sum(matches) / len(matches))
+                matchData.append({
+                    'person': possiblePerson,
+                    'matchAccuracy': matchAccuracy
+                    })
+
+            matched = False
+            if len(matchData):
+                data = {'matchAccuracy':-1}
+
+                for d in matchData:
+                    if d['matchAccuracy'] > data['matchAccuracy']:
+                        data = d
+
+                matchAccuracy = data['matchAccuracy']
+
+                if matchAccuracy > args.matchaccuracy:
+                    print('Face better matches {}'.format(data['person']['name']))
+
 
 video_capture.release()
 cv2.destroyAllWindows()
