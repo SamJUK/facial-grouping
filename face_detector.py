@@ -33,10 +33,8 @@ video_capture_frame_count = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT));
 print('Total Frames: {}'.format(video_capture_frame_count))
 
 # sort inital folders
-base_folder = 'output/{}'.format(re.sub('[^0-9a-zA-Z]+', '_', video))
-faces_folder = '{}/faces'.format(base_folder)
+base_folder = 'faces/{}'.format(re.sub('[^0-9a-zA-Z]+', '_', video))
 makeFolder(base_folder)
-makeFolder(faces_folder)
 
 face_encs = []
 face_names = []
@@ -119,7 +117,7 @@ while video_capture.isOpened():
         for (top, right, bottom, left), name, matchP in zip(face_locations, names, matchPs):
             # Write to disk
             face_frame = frame.copy()
-            person_folder = '{}/{}'.format(faces_folder, name)
+            person_folder = '{}/{}'.format(base_folder, name)
             makeFolder(person_folder)
             cv2.imwrite('{}/{}.jpg'.format(person_folder, str(uuid.uuid4())), face_frame[top:bottom, left:right])
 

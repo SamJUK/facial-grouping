@@ -1,7 +1,7 @@
 !.DS_Store
 
-input/*
-!input/face-demographics-walking.mp4
+videos/*
+!videos/face-demographics-walking.mp4
 
-output/*
-!output/.gitkeep
+faces/*
+!faces/.gitkeep
