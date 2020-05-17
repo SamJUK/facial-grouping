@@ -4,7 +4,8 @@ Extracts faces from videos and tries to group them by person
 
 
 ```sh
-$ python face_detector.py --video=input/face-demographics-walking.mp4 --tolerance=.55 --blur=100
+$ python face_detector.py --video=videos/face-demographics-walking.mp4 --tolerance=.55 --blur=100
+$ python age_gender_detect.py --images=faces/videos_face_demographics_walking_mp4/E1
 ```
 
 - If classifying same person as different people, raise tolerance
