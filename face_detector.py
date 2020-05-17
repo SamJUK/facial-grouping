@@ -5,6 +5,7 @@ import uuid
 import os
 import re
 import argparse
+import statistics
 
 def makeFolder(path): 
     try:
@@ -19,6 +20,9 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--video')
 parser.add_argument('--frames', nargs='?', const=1, type=float, default=.01)
 parser.add_argument('--matchaccuracy', nargs='?', const=1, type=float, default=.15)
+parser.add_argument('--tolerance', nargs='?', const=1, type=float, default=.6)
+parser.add_argument('--blur', nargs='?', const=1, type=int, default=0)
+parser.add_argument('--framesize', nargs='?', const=1, type=int, default=1)
 args=parser.parse_args()
 
 # Open video file
@@ -52,9 +56,8 @@ while video_capture.isOpened():
     if not ret:
         break
 
-    # Resize frame of video to 1/4 size for faster face recognition processing
-    # small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-
+    # Resize frame of video can cause faster face recognition processing
+    frame = cv2.resize(frame, (0, 0), fx=args.framesize, fy=args.framesize)
 
     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
     rgb_frame = frame[:, :, ::-1]
@@ -73,7 +76,7 @@ while video_capture.isOpened():
         for face in face_encodings:
             matchData = []
             for person in persons:
-                matches = face_recognition.compare_faces(person['faces'], face)
+                matches = face_recognition.compare_faces(person['faces'], face, args.tolerance)
                 matchAccuracy = (sum(matches) / len(matches))
                 matchData.append({
                     'person': person,
@@ -92,7 +95,7 @@ while video_capture.isOpened():
 
                 if matchAccuracy > args.matchaccuracy:
                     name = data['person']['name']
-                    person['faces'].append(face)
+                    data['person']['faces'].append(face)
                     matched = True
             
             if not matched:
@@ -108,30 +111,39 @@ while video_capture.isOpened():
             names.append(name)
             matchPs.append(matchAccuracy)
 
+        # Display the resulting image
+        output_frame = frame.copy()
+        if args.blur > 0:
+            output_frame = cv2.blur(output_frame, (args.blur, args.blur), cv2.BORDER_DEFAULT)
 
         for (top, right, bottom, left), name, matchP in zip(face_locations, names, matchPs):
             # Write to disk
-            of = frame.copy()
-            fname = str(uuid.uuid4())
+            face_frame = frame.copy()
             person_folder = '{}/{}'.format(faces_folder, name)
             makeFolder(person_folder)
-            cv2.imwrite('{}/{}.jpg'.format(person_folder,fname), of[top:bottom, left:right])
+            cv2.imwrite('{}/{}.jpg'.format(person_folder, str(uuid.uuid4())), face_frame[top:bottom, left:right])
 
             # Draw a box around the face
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+            cv2.rectangle(output_frame, (left, top), (right, bottom), (0, 0, 255), 2)
+            cv2.putText(output_frame, '{} ({})'.format(name, round(matchP, 2)), (left + 6, bottom - 6), cv2.FONT_HERSHEY_SIMPLEX, .5, (255, 255, 255),  1, cv2.LINE_AA)
 
-            # Draw a label with a name below the face
-            # cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(frame, '{} ({})'.format(name, round(matchP, 2)), (left + 6, bottom - 6), font, .5, (255, 255, 255),  1, cv2.LINE_AA)
-
-        # Display the resulting image
-        cv2.imshow('Video', frame)
+        cv2.imshow('Video Facial Extraction Classification', output_frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+
+averageFaces = statistics.mean(map(lambda p: len(p['faces']), persons))
+
+print('Checking for potential false positive Threshold ({})'.format(averageFaces))
+for person in persons:
+    faceThreshold = averageFaces * .25
+    faceCount = len(person['faces'])
+
+    if len(person['faces']) < faceThreshold:
+        print(' - Potential false: {} faces ({}/{})'.format(person['name'], faceCount, faceThreshold))
 
 
 video_capture.release()
 cv2.destroyAllWindows()
 
-
+print('Finished')
