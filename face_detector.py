@@ -1,11 +1,18 @@
-import face_recognition
-import cv2
-import numpy as np
-import uuid
 import os
 import re
+import uuid
+
 import argparse
 import statistics
+
+import cv2
+import face_recognition
+
+#
+#
+# Functions
+#
+#
 
 def makeFolder(path): 
     try:
@@ -14,7 +21,6 @@ def makeFolder(path):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-
 
 def checkFaceMatchesPerson(face, skips = []):
     result = []
@@ -67,6 +73,14 @@ def createNewPerson(face):
     persons.append(newPerson)
 
     return newPerson
+
+
+#
+#
+# Logic Start
+#
+#
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--video')
