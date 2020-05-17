@@ -2,6 +2,7 @@ import cv2
 import math
 import argparse
 import os
+import json
 
 # Input Aargs
 parser = argparse.ArgumentParser()
@@ -12,6 +13,11 @@ args = parser.parse_args()
 MODEL_MEAN_VALUES = (78.4263377603, 87.7689143744, 114.895847746)
 ageList = ['(0-2)', '(4-6)', '(8-12)', '(15-20)', '(25-32)', '(38-43)', '(48-53)', '(60-100)']
 genderList = ['Male','Female']
+outputData = {
+	"overview": {},
+	"lists": {},
+	"files": []
+}
 
 # Setuo Neural Networks
 ageNet = cv2.dnn.readNet("networks/age/age_net.caffemodel", "networks/age/age_deploy.prototxt")
@@ -53,6 +59,11 @@ for image_name in images:
 
 	# Print output to console
 	print(f'{image_name} :: {gender}, {age}')
+	outputData['files'].append({
+		'image_name': image_name,
+		'gender': gender,
+		'age': age
+		})
 
 
 
@@ -72,11 +83,20 @@ age_list = sorted(list(map(lambda age: {
 		'percent': round(res['age'][age] / total_age * 100)
 		}, res['age'])), key=lambda k: k['count'], reverse=True)
 
+outputData['lists']['age'] = age_list
+outputData['lists']['gender'] = gender_list
+
+
 
 # Display to user
 print('*******************************')
-print('- Gender: {} ({}%)'.format(gender_list[0]['label'], gender_list[0]['percent']))
-print('- Age: {} ({}%)'.format(age_list[0]['label'], age_list[0]['percent']))
+gender = gender_list[0]
+print('- Gender: {} ({}%)'.format(gender['label'], gender['percent']))
+outputData['overview']['gender'] = gender
+
+age = age_list[0]
+print('- Age: {} ({}%)'.format(age['label'], age['percent']))
+outputData['overview']['age'] = age
 
 print('*******************************')
 print('# Genders')
@@ -88,4 +108,19 @@ print('# Ages')
 
 for i in age_list:
 	print(' - {}: {} ({}%)'.format(i['label'], i['count'], i['percent']))
+
+
+# Write file data
+file_name = os.path.dirname(images[0]) + '/age_gender_output.json'
+with open(file_name, 'w', encoding='utf-8') as file:
+    json.dump(outputData, file, ensure_ascii=False, indent=4)
+
+
+
+
+
+
+
+
+
 	
