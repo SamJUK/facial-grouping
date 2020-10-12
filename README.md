@@ -1,6 +1,6 @@
 # Python Face Extraction
 
-Extracts faces from videos and tries to group them by person
+This project is made up of two components, a video face extractor and an age & gender detector. The idea of the project is to be able to run community made videos through it and classify by the age of the people within them. So those of certain age groups can be flagged for manual review.
 
 
 ```sh
@@ -25,3 +25,6 @@ $ python age_gender_detect.py --images=faces/videos_face_demographics_walking_mp
 - **blur:** Integer of blur intensity (only affects preview)
 - **framesize:** float from `0 - 1` that scales the image size (smaller is faster but less accurate)
 - **tolerance:** Face detection match tolerance
+
+## Networks
+The Age & Gender detection models are based from the [AgeGenderDeepLearning](https://github.com/GilLevi/AgeGenderDeepLearning) project.
